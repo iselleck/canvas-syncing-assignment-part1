@@ -2,12 +2,56 @@
 <html lang="en">
 <head>
     <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/babel" >
         "use strict";
+
+let socket;
+let myNum;
+
+const connectSocket = (e) => {
+    var valToChange = document.querySelector("#valChng");
+    socket = io.connect();
+    
+    socket.on('aNum', (data) => {
+       myNum = data.num; 
+        console.log(myNum);
+    });
+    
+    socket.on('connect', () => {
+        console.log('connecting')
+        
+        setInterval(sendMsg, 2000);
+    });
+    
+    socket.on('updateMyNum', (data) => {
+        valToChange.innerHTML = data.msg;
+    });
+}
+
+const sendMsg = () => {
+    myNum += 5;
+    
+    
+    let msgData = {
+        msg: myNum
+    };
+    
+    socket.emit('updateMyNum', msgData);
+    
+};
+
+const init = () => {
+  connectSocket();  
+};
+
+window.onload = init;
     
     </script>
 </head>
 <body>
+    
+    <h1>Current Value: <p style="display:inline;" id="valChng"></p> </h1>     
 
 </body>
 </html>
